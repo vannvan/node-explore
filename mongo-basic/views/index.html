@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>user</title>
 </head>
 <style>
     .content {
@@ -34,49 +34,94 @@
         height: 20px;
         cursor: pointer;
     }
+
+    .page {
+        height: 35px;
+        display: flex;
+        margin-top: 35px;
+        justify-content: flex-start;
+        align-items: center;
+
+
+    }
+
+    .page>.page-item {
+        height: 35px;
+        width: 35px;
+        line-height: 35px;
+        list-style: none;
+        background: lightblue;
+        margin-right: 15px;
+        text-align: center;
+        cursor: pointer;
+    }
 </style>
 
 <body>
-    <div class="content">
-
-    </div>
-    <form action="/addUser" method="GET">
-        <h1>新增：</h1>
-        <input type="text" name="name">
-        <input type="button" id="addButton" value="新增">
-    </form>
+    <div class="content"></div>
+    <div class="page"></div>
+    <h1>新增：</h1>
+    <input type="text" name="name">
+    <button id="addButton">新增</button>
 
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
     <script>
         let content = $('.content')
 
-        function getList() {
-            $.get('/list', function (res) {
-                $('.item').remove()
-                res = JSON.parse(res)
-                let itemStr = ''
-                res.map(el => {
-                    itemStr +=
-                        `<li class='item'>${el.name} <button data-name="${el.name}">删除</button></li>`
+        function getList(current_page) {
+            let params = {
+                per_size: 5,
+                current_page: current_page || 1
+            }
+            $.post({
+                url: "/list",
+                // contentType: "application/json;charset=utf-8",
+                data: params,
+                dataType: 'json',
+                success: (res => {
+                    $('.item').remove()
+                    $('.page-item').remove()
+                    let itemStr = ''
+                    res.data.map(el => {
+                        itemStr +=
+                            `<li class='item'>${el.name} <button data-id="${el._id}">删除</button></li>`
+                    })
+                    content.append(itemStr)
+                    let pageItemStr = ''
+                    //总共需要分多少页
+                    let countPage = parseInt(res.total_size / 5) + 1
+                    for (let i = 0; i < countPage; i++) {
+                        pageItemStr += `<li class="page-item" data-index="${i+1}">${i+1}</li>`
+                    }
+                    $(".page").append(pageItemStr)
                 })
-                content.append(itemStr)
             })
         }
+        //
         content.click(function (e) {
-            let name = $(e.target).attr('data-name')
-            if (name) {
-                handleDeleteItem(name)
+            let itemId = $(e.target).attr('data-id')
+            if (itemId) {
+                handleDeleteItem(itemId)
             }
         })
+
+        //分页
+        $('.page').click(function (e) {
+            let current_page = $(e.target).attr('data-index')
+            getList(current_page)
+        })
+
+
+
         //获取
         getList()
         //删除
-        function handleDeleteItem(name) {
+        function handleDeleteItem(itemId) {
             $.get('/delUser', {
-                name: name
+                id: itemId
             }, function (res) {
                 console.log(res)
-                if(res) {
+                if (res) {
                     getList()
                 }
             })
@@ -97,7 +142,7 @@
                 name: newName
             }, function (res) {
                 console.log(res)
-                if(res) {
+                if (res) {
                     getList()
                 }
             })
