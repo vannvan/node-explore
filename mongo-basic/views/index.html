@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .content {
+        width: 500px;
+        height: auto;
+    }
+
+    .content>.item {
+        list-style: none;
+        height: 35px;
+        width: 100%;
+        background: #ededed;
+        line-height: 35px;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 30px;
+        box-sizing: content-box;
+
+    }
+
+    button {
+        border: none;
+        background: lightblue;
+        width: 80px;
+        height: 20px;
+        cursor: pointer;
+    }
+</style>
+
+<body>
+    <div class="content">
+
+    </div>
+    <form action="/addUser" method="GET">
+        <h1>新增：</h1>
+        <input type="text" name="name">
+        <input type="button" id="addButton" value="新增">
+    </form>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script>
+        let content = $('.content')
+
+        function getList() {
+            $.get('/list', function (res) {
+                $('.item').remove()
+                res = JSON.parse(res)
+                let itemStr = ''
+                res.map(el => {
+                    itemStr +=
+                        `<li class='item'>${el.name} <button data-name="${el.name}">删除</button></li>`
+                })
+                content.append(itemStr)
+            })
+        }
+        content.click(function (e) {
+            let name = $(e.target).attr('data-name')
+            if (name) {
+                handleDeleteItem(name)
+            }
+        })
+        //获取
+        getList()
+        //删除
+        function handleDeleteItem(name) {
+            $.get('/delUser', {
+                name: name
+            }, function (res) {
+                console.log(res)
+                if(res) {
+                    getList()
+                }
+            })
+        }
+
+        //新增
+        $("#addButton").click(function (e) {
+            // console.log($("input[name='name']").val())
+            let newName = $("input[name='name']").val()
+            if (newName) {
+                handleAddNewName(newName)
+            }
+        })
+
+        function handleAddNewName(newName) {
+            console.log(newName)
+            $.get('/addUser', {
+                name: newName
+            }, function (res) {
+                console.log(res)
+                if(res) {
+                    getList()
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>
