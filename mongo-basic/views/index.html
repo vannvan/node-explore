@@ -84,7 +84,7 @@
                     let itemStr = ''
                     res.data.map(el => {
                         itemStr +=
-                            `<li class='item'>${el.name} <button data-id="${el._id}">删除</button></li>`
+                            `<li class='item'>${el.name} <button class="delete" data-id="${el._id}">删除</button><button class="edit" data-id="${el._id}">编辑</button></li>`
                     })
                     content.append(itemStr)
                     let pageItemStr = ''
@@ -99,10 +99,17 @@
         }
         //
         content.click(function (e) {
+            console.log(e.target)
+            let actionType = $(e.target).attr('class')
             let itemId = $(e.target).attr('data-id')
-            if (itemId) {
+
+            if (actionType == 'delete' && itemId) {
                 handleDeleteItem(itemId)
             }
+            if(actionType == 'edit' && itemId) {
+                console.log(e.originalEvent.path)
+            }
+
         })
 
         //分页

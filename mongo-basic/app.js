@@ -36,9 +36,16 @@ glob.sync(resolve('./views', "**/*.html")).forEach((item, i) => {
 
 
 app.use(express.json()) // for parsing application/json
-app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(express.urlencoded({
+    extended: true
+})) // for parsing application/x-www-form-urlencoded
 // app.use(bodyParser.urlencoded({extended:false}))
 app.use('/', userRouter)
+
+//重定向到首页
+app.get('/', function (req, res) {
+    res.redirect('/index');
+});
 
 
 app.listen(3000) //监听3000端口，默认localhost: 127.0.0.1 || 0.0.0.0
