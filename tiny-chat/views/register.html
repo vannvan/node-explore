@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册</title>
+</head>
+
+<body>
+    <input type="text" name="name" />
+    <input type="text" name="password" id="">
+    <button id="register-btn">注册</button>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script>
+        $("#register-btn").click(function () {
+            let nameVal = $("input[name='name']").val()
+            let passwordVal = $("input[name='password']").val()
+            if(!nameVal) {
+                console.log('用户名不能为空')
+                return
+            } 
+            if(!password) {
+                console.log('密码不能为空')
+                return
+            }
+            let params = {
+                name: nameVal,
+                password: passwordVal
+            }
+            $.post('/register', params, function (res) {
+                console.log(res)
+            })
+        })
+    </script>
+</body>
+
+</html>

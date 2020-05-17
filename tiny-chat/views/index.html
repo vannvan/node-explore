@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index</title>
+</head>
+
+<body>
+    <input type="text" name="msg">
+    <button id="btn">发送</button>
+
+    <div id="content"></div>
+
+</body>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+<script>
+    const ws = new WebSocket('ws://192.168.31.200:8000') //连接到客户端
+    let uuid = Math.random().toString(36).substring(2);
+    sessionStorage.setItem("uuid", uuid);
+    var content = $("#content")
+    let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+    //上线
+    ws.onopen = () => {
+        // ws.send('我上线啦')
+        ws.send(JSON.stringify({
+            uuid: uuid,
+            userName: userInfo.name
+        }))
+        content.innerText = 'aaaaaa'
+    }
+    //发送信息
+    ws.onmessage = (msg) => {
+        // console.log(msg)
+        const content = document.getElementById('content');
+        content.innerText += msg.data + '<br>'
+    }
+    //报错
+    ws.onerror = err => {
+        console.log(err)
+    }
+
+    //下线
+    ws.onclose = () => {
+        console.log('close')
+    }
+
+    $("#btn").click(function () {
+        let msg = $("input[name='msg']").val()
+        ws.send(JSON.stringify({
+            uuid: uuid,
+            userName: userInfo.name,
+            message: msg
+        }))
+    })
+
+    //获取当前在线用户
+    function getOnlineUserList() {
+        $.post('get-online', function (res) {
+            console.log('当前在线', res)
+        })
+    }
+</script>
+
+</html>
