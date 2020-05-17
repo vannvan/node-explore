@@ -38,8 +38,18 @@ ws.on('connection', (client) => { //连接客户端
     }))
     // 下线信息
     client.on('close', () => {
+        let userList = Object.keys(clients)
         delete clients[client.name];
         console.log('用户' + client.name + '下线了~~')
+        for (var key in clients) {
+            // clients[key].send('用户' + client.name + '说：' + msg)
+            clients[key].send(JSON.stringify({
+                userName: client.name,
+                msg: client.name + '下线了',
+                msgType: 'notice',
+                userList: userList
+            }))
+        }
     })
 })
 
@@ -47,15 +57,24 @@ ws.on('connection', (client) => { //连接客户端
 function broadcast(client, msg) {
     let userList = Object.keys(clients)
     console.log('当前在线用户', userList)
-    for (var key in clients) {
-        // clients[key].send('用户' + client.name + '说：' + msg)
-        clients[key].send(JSON.stringify({
-            userName: client.name,
-            msg: msg,
-            userList: userList
-        }))
-
-    }
+    // for (var key in clients) {
+    // clients[key].send('用户' + client.name + '说：' + msg)
+    //给所有用户发消息
+    // clients[key].send(JSON.stringify({
+    //     userName: client.name,
+    //     msg: msg,
+    //     msgType: 'msg',
+    //     userList: userList
+    // }))
+    //给某个用户发消息
+    // }
+    let receiverName = client.name == 'user1' ? 'test2' : 'user1'
+    clients[receiverName].send(JSON.stringify({
+        userName: client.name,
+        msg: msg,
+        msgType: 'msg',
+        userList: userList
+    }))
 }
 
 
@@ -64,6 +83,20 @@ function noticeOnline(client) {
     let userList = Object.keys(clients)
     clients[client.name].send(JSON.stringify({
         msg: "你上线了",
-        userList: userList
+        userList: userList,
+        msgType: 'notice'
     }))
+    let receiverName = client.name == 'user1' ? 'test2' : 'user1'
+    noticeOtherUserSomeOneIsOnline(client, receiverName, userList)
+}
+
+//通知其他用户某用户上线
+function noticeOtherUserSomeOneIsOnline(currentUser, otherUser, userList) {
+    if (clients[otherUser]) {
+        clients[otherUser].send(JSON.stringify({
+            msg: currentUser.name + "上线了",
+            userList: userList,
+            msgType: 'notice'
+        }))
+    }
 }

@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <input type="text" name="name"  />
+    <input type="text" name="name" />
     <input type="text" name="password">
     <button id="login-btn">登录</button>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
@@ -30,6 +30,8 @@
                 if (status == 1) {
                     console.log(data)
                     sessionStorage.setItem("userInfo", JSON.stringify(data));
+                    let uuid = Math.random().toString(36).substring(2);
+                    sessionStorage.setItem("uuid", uuid);
                     window.location.href = '/index'
                 } else {
                     alert(message)

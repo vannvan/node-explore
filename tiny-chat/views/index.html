@@ -6,21 +6,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>index</title>
 </head>
+<style>
+    .container {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    #user-list {
+        height: 500px;
+        width: 500px;
+        background: lightblue;
+    }
+
+    #user-list>li {
+        list-style: none;
+        height: 35px;
+        line-height: 35px;
+        border-bottom: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    .form-content {
+        width: 500px;
+        height: 500px;
+        background: lightcoral;
+    }
+
+    #msg-content {
+        width: 100%;
+        height: 460px;
+        background: lightgreen;
+    }
+
+    .input-content {
+        height: 40px;
+        display: flex;
+        box-sizing: border-box;
+    }
+
+    .msg-input {
+        border: none;
+        height: 40px;
+        width: 400px;
+    }
+
+    .send-btn {
+        width: 100px;
+        height: 40px;
+        border: none;
+        line-height: 40px;
+        cursor: pointer;
+        text-align: center;
+    }
+</style>
 
 <body>
-    <input type="text" name="msg">
-    <button id="btn">发送</button>
+    <div class="container">
+        <div id="user-list"></div>
+        <div class="form-content">
+            <div id="msg-content"></div>
+            <div class="input-content">
+                <input class="msg-input" type="text" name="msg">
+                <span id="btn" class="send-btn">发送</span>
+            </div>
 
-    <div id="content"></div>
+        </div>
+
+        <div id="content"></div>
+    </div>
+
 
 </body>
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
 <script>
     const ws = new WebSocket('ws://192.168.31.200:8000') //连接到客户端
-    let uuid = Math.random().toString(36).substring(2);
-    sessionStorage.setItem("uuid", uuid);
     var content = $("#content")
     let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+    let uuid = sessionStorage.getItem('uuid')
     //上线
     ws.onopen = () => {
         // ws.send('我上线啦')
@@ -32,9 +95,10 @@
     }
     //发送信息
     ws.onmessage = (msg) => {
-        // console.log(msg)
-        const content = document.getElementById('content');
-        content.innerText += msg.data + '<br>'
+
+        let resData = JSON.parse(msg.data)
+        renderMsgContent(resData)
+        renderUserList(resData.userList)
     }
     //报错
     ws.onerror = err => {
@@ -60,6 +124,24 @@
         $.post('get-online', function (res) {
             console.log('当前在线', res)
         })
+    }
+
+    //渲染用户列表
+    function renderUserList(params) {
+        $("#user-list").empty()
+        let userItemHtml = ''
+        if (params.length == 0) return
+        params.map(el => {
+            userItemHtml += `<li>${el}</li>`
+        })
+        $("#user-list").append(userItemHtml)
+
+    }
+    //渲染消息列表
+    function renderMsgContent(params) {
+        console.log(params)
+        let msgHtmlStr = `<li>${params.userName || ''} ${params.msg}</li>`
+        $("#msg-content").append(msgHtmlStr)
     }
 </script>
 
