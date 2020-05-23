@@ -4,13 +4,7 @@ const ws = new webSocket.Server({
     port: 8000
 }); //创建服务器,端口为8000
 let clients = {}
-let clientNum = 0
 ws.on('connection', (client) => { //连接客户端
-
-    //给客户端编号,也就是参与聊天的用户
-    // client.name = ++clientNum;
-
-    // clients[client.name] = client;
     // 用户的聊天信息
     client.on('message', (msg) => {
         let userMsg = JSON.parse(msg)
@@ -55,7 +49,7 @@ ws.on('connection', (client) => { //连接客户端
 
 //广播方法
 function broadcast(client, msg) {
-    let userList = Object.keys(clients)
+    let userList = Object.keys(clients
     console.log('当前在线用户', userList)
     // for (var key in clients) {
     // clients[key].send('用户' + client.name + '说：' + msg)

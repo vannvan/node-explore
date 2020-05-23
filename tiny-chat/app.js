@@ -4,7 +4,7 @@
 const express = require('express')
 const app = express()
 const glob = require("glob");
-require('./routes/chat')
+require('./routes/chats')
 // const expressWs = require('express-ws');
 // const bodyParser = require('body-parser');
 const {
@@ -38,11 +38,10 @@ glob.sync(resolve('./views', "**/*.html")).forEach((item, i) => {
 
 
 
-app.use(express.json()) // for parsing application/json
+app.use(express.json()) 
 app.use(express.urlencoded({
     extended: true
-})) // for parsing application/x-www-form-urlencoded
-// app.use(bodyParser.urlencoded({extended:false}))
+})) 
 
 
 

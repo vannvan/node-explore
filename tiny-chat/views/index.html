@@ -70,12 +70,11 @@
                 <input class="msg-input" type="text" name="msg">
                 <span id="btn" class="send-btn">发送</span>
             </div>
-
         </div>
-
         <div id="content"></div>
     </div>
 
+    <button id="close">关闭</button>
 
 </body>
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
@@ -89,14 +88,14 @@
         // ws.send('我上线啦')
         ws.send(JSON.stringify({
             uuid: uuid,
-            userName: userInfo.name
+            sender: userInfo.name
         }))
         content.innerText = 'aaaaaa'
     }
     //发送信息
     ws.onmessage = (msg) => {
-
         let resData = JSON.parse(msg.data)
+        console.log('接收到来自server的消息',resData)
         renderMsgContent(resData)
         renderUserList(resData.userList)
     }
@@ -114,7 +113,8 @@
         let msg = $("input[name='msg']").val()
         ws.send(JSON.stringify({
             uuid: uuid,
-            userName: userInfo.name,
+            sender: userInfo.name,
+            receiver: userInfo.name == 'user1' ? 'test2' : "user1",
             message: msg
         }))
     })
@@ -128,9 +128,10 @@
 
     //渲染用户列表
     function renderUserList(params) {
+        console.log('当前在线用户',params)
         $("#user-list").empty()
         let userItemHtml = ''
-        if (params.length == 0) return
+        if (params && params.length == 0) return
         params.map(el => {
             userItemHtml += `<li>${el}</li>`
         })
@@ -140,9 +141,14 @@
     //渲染消息列表
     function renderMsgContent(params) {
         console.log(params)
-        let msgHtmlStr = `<li>${params.userName || ''} ${params.msg}</li>`
+        let msgHtmlStr = `<li>${params.sender || ''} ${params.message} ${params.timestamp}</li>`
         $("#msg-content").append(msgHtmlStr)
     }
+
+    $("#close").click(function() {
+        console.log('close')
+        ws.close()
+    })
 </script>
 
 </html>

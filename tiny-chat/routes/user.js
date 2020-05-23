@@ -47,7 +47,6 @@ router.post('/login', function (request, response) {
     User.findOne({
         name: params.name
     }, function (error, res) {
-        console.log(res)
         if (!res) {
             response.send(sendJson(0, '用户不存在'))
         } else {
